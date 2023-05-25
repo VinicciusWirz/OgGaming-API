@@ -29,7 +29,7 @@ export function getProfilePicDB(userId) {
   const result = db.query(
     `
       SELECT image_url FROM images
-      WHERE user_id=$1;
+      WHERE user_id=$1 AND is_profile=true;
     `,
     [userId]
   );

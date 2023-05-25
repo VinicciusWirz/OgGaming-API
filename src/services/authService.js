@@ -4,6 +4,7 @@ import {
 } from "../repositories/auth.repository.js";
 import genDefUsername from "../utils/GenDefUsername.js";
 import bcrypt from "bcrypt";
+import { getProfilePicDB } from "../repositories/images.repository.js";
 
 export async function createNewUsername() {
   const username = genDefUsername();
@@ -28,7 +29,15 @@ export async function authenticateUser(email, password) {
     const userPassword = rows[0].password;
     const comparePassword = bcrypt.compareSync(password, userPassword);
     if (!comparePassword) return { error: { status: 401 } };
-    return { id: rows[0].id, name: rows[0].name, username: rows[0].username };
+    const userId = rows[0].id;
+    const { rows: image } = await getProfilePicDB(userId);
+    const pfp = image[0].image_url;
+    return {
+      id: userId,
+      name: rows[0].name,
+      username: rows[0].username,
+      image: pfp,
+    };
   } catch (error) {
     return { error: error.message };
   }

@@ -24,3 +24,14 @@ export function createUserDefPicDB(userId) {
   );
   return result;
 }
+
+export function getProfilePicDB(userId) {
+  const result = db.query(
+    `
+      SELECT image_url FROM images
+      WHERE user_id=$1;
+    `,
+    [userId]
+  );
+  return result;
+}

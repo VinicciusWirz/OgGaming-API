@@ -23,3 +23,13 @@ export function checkUsernameDB(username) {
   );
   return result;
 }
+
+export function checkUserEmailDB(email) {
+  const result = db.query(
+    `
+        SELECT id, password FROM users WHERE email=$1;
+    `,
+    [email]
+  );
+  return result;
+}

@@ -1,8 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { createUserDB } from "../repositories/auth.repository.js";
-import { createUserDefPicDB, createUserPicDB } from "../repositories/images.repository.js";
-import { createNewUsername } from "../services/usernameService.js";
+import {
+  createUserDefPicDB,
+  createUserPicDB,
+} from "../repositories/images.repository.js";
+import {
+  authenticateUser,
+  createNewUsername,
+} from "../services/authService.js";
 
 export async function signup(req, res) {
   const { name, email, bio, password, picture } = req.body;
@@ -19,10 +25,10 @@ export async function signup(req, res) {
       username
     );
     const userId = rows[0].id;
-    if(picture){
+    if (picture) {
       await createUserPicDB(picture, userId);
     } else {
-      await createUserDefPicDB(userId)
+      await createUserDefPicDB(userId);
     }
     res.sendStatus(201);
   } catch (error) {
@@ -32,8 +38,13 @@ export async function signup(req, res) {
 }
 
 export async function signin(req, res) {
+  const { email, password } = req.body;
+
   try {
-    res.status(200).send("Token-Placeholder");
+    const { id, error } = await authenticateUser(email, password);
+    if (error) return res.sendStatus(error.status);
+    const token = jwt.sign({ id, email }, process.env.SECRET_KEY);
+    res.status(200).send({ token });
   } catch (error) {
     res.status(500).send(error.message);
   }

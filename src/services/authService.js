@@ -28,7 +28,7 @@ export async function authenticateUser(email, password) {
     const userPassword = rows[0].password;
     const comparePassword = bcrypt.compareSync(password, userPassword);
     if (!comparePassword) return { error: { status: 401 } };
-    return { id: rows[0].id };
+    return { id: rows[0].id, name: rows[0].name, username: rows[0].username };
   } catch (error) {
     return { error: error.message };
   }

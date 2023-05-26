@@ -43,3 +43,17 @@ export function getUserPosts(userId) {
   );
   return result;
 }
+
+export function insertNewPostDB(content, image_id, userId) {
+  const result = db.query(
+    `
+        INSERT INTO posts
+        (user_id, image_id, content)
+        VALUES
+        ($1, $2, $3)
+        RETURNING id;
+    `,
+    [userId, image_id, content]
+  );
+  return result;
+}

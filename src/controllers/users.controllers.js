@@ -23,10 +23,22 @@ export async function getFollowerList(req, res) {
   }
 }
 
-export async function getFollowingList(req,res){
+export async function getFollowingList(req, res) {
   const userId = res.locals.userId;
   try {
     const result = await usersService.fetchFollowingList(userId);
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}
+
+export async function getSearchQuery(req, res) {
+  const userId = res.locals.userId;
+  const name = req.params.name;
+  try {
+    const result = await usersService.fetchUserQuery(userId, name);
 
     res.status(200).send(result);
   } catch (error) {

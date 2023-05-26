@@ -134,8 +134,8 @@ export function getPublicUserPosts(visitorUserId, userId) {
           ) AS profile_image,
           COUNT(f.id) AS followers,
           COUNT(f2.id) AS following,
-          (SELECT EXISTS (SELECT 1 FROM follows WHERE user_id = $2 AND following_user_id = users.id)) AS is_following,
-          (SELECT EXISTS (SELECT 1 FROM follows WHERE user_id = users.id AND following_user_id = $2)) AS is_follower,
+          (SELECT EXISTS (SELECT 1 FROM follows WHERE user_id = $2 AND following_user_id = $1)) AS is_following,
+          (SELECT EXISTS (SELECT 1 FROM follows WHERE user_id = $1 AND following_user_id = $2)) AS is_follower,
           CASE
             WHEN COUNT( posts.id ) > 0
               THEN JSONB_AGG(JSONB_BUILD_OBJECT(

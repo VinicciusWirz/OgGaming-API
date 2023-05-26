@@ -83,3 +83,54 @@ export function findFollowers(userId) {
   );
   return result;
 }
+
+export function findFollowing(userId) {
+  const result = db.query(
+    `
+      SELECT
+        users.id,
+        users.name,
+        users.username,
+        users.bio,
+        EXISTS (
+          SELECT 1
+          FROM follows
+          WHERE follows.user_id = $1
+            AND follows.following_user_id = users.id
+        ) AS is_following,
+        EXISTS (
+          SELECT 1
+          FROM follows
+          WHERE follows.user_id = users.id
+            AND follows.following_user_id = $1
+        ) AS is_follower,
+        (
+          SELECT images.image_url
+          FROM images
+          WHERE images.user_id = users.id
+            AND images.is_profile = true
+        ) AS profile_image,
+        (
+          SELECT COUNT(*)
+          FROM follows
+          WHERE follows.user_id = users.id
+        ) AS following_count,
+        (
+          SELECT COUNT(*)
+          FROM follows
+          WHERE follows.following_user_id = users.id
+        ) AS followers_count
+      FROM
+        users
+      WHERE
+        EXISTS (
+        SELECT 1
+        FROM follows
+        WHERE follows.user_id = $1
+          AND follows.following_user_id = users.id
+      );
+  `,
+    [userId]
+  );
+  return result;
+}

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { followUser, getFollowerList } from "../controllers/users.controllers.js";
+import { followUser, getFollowerList, getFollowingList } from "../controllers/users.controllers.js";
 import authValidation from "../middlewares/authValidation.middleware.js";
 import usernameValidation from "../middlewares/usernameValidation.middleware.js";
 
@@ -12,5 +12,6 @@ userRouter.post(
   followUser
 );
 userRouter.get("/user/followers", authValidation, getFollowerList)
+userRouter.get("/user/following", authValidation, getFollowingList)
 
 export default userRouter;

@@ -1,5 +1,6 @@
 import {
   findFollowers,
+  findFollowing,
   followReq,
   isFollowing,
   unfollowReq,
@@ -28,5 +29,14 @@ async function fetchFollowerList(userId) {
   }
 }
 
-const usersService = { followHandle, fetchFollowerList };
+async function fetchFollowingList(userId) {
+  try {
+    const { rows } = await findFollowing(userId);
+    return rows;
+  } catch (error) {
+    return error.message;
+  }
+}
+
+const usersService = { followHandle, fetchFollowerList, fetchFollowingList };
 export default usersService;

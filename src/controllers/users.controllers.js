@@ -22,3 +22,14 @@ export async function getFollowerList(req, res) {
     res.status(500).send(error.message);
   }
 }
+
+export async function getFollowingList(req,res){
+  const userId = res.locals.userId;
+  try {
+    const result = await usersService.fetchFollowingList(userId);
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}

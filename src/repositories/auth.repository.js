@@ -24,6 +24,16 @@ export function checkUsernameDB(username) {
   return result;
 }
 
+export function checkUserIdDB(userId){
+  const result = db.query(
+    `
+        SELECT * FROM users WHERE id=$1;
+    `,
+    [userId]
+  );
+  return result;
+}
+
 export function checkUserEmailDB(email) {
   const result = db.query(
     `

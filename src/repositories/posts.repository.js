@@ -1,6 +1,6 @@
 import { db } from "../database/database.connection.js";
 
-export function getUserPosts(userId) {
+export function getUserPosts(targetId, userId) {
   const result = db.query(
     `
     SELECT 
@@ -20,8 +20,21 @@ export function getUserPosts(userId) {
           'id', posts.id,
           'name', users.name,
           'username', users.username,
+          'poster_profile_pic', (
+            SELECT i2.image_url
+            FROM images i2
+            WHERE i2.user_id = $1 AND i2.is_profile = true
+            LIMIT 1
+          ),
           'image', images.image_url,
-          'content', posts.content
+          'content', posts.content,
+          'created_at', posts.created_at,
+          'likes', ( SELECT COUNT(*) FROM likes WHERE post_id = posts.id),
+          'user_liked', (
+            SELECT EXISTS(
+              SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = $2
+            )
+            )
         ))
       ELSE '[]'
     END AS posts
@@ -39,7 +52,7 @@ export function getUserPosts(userId) {
     GROUP BY
         users.id;
     `,
-    [userId]
+    [targetId, userId]
   );
   return result;
 }

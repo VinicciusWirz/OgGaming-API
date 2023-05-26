@@ -3,8 +3,9 @@ import postService from "../services/postService.js";
 
 export async function getUserPost(req, res) {
   const userId = res.locals.userId;
+  const targetId = req.params.id || userId;
   try {
-    const { rows } = await getUserPosts(userId);
+    const { rows } = await getUserPosts(targetId, userId);
     res.status(200).send(rows[0]);
   } catch (error) {
     res.status(500).send(error.message);

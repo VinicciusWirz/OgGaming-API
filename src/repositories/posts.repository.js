@@ -1,6 +1,6 @@
 import { db } from "../database/database.connection.js";
 
-export function getUserPosts(targetId, userId) {
+export function getUserPosts(userId) {
   const result = db.query(
     `
     SELECT 
@@ -12,8 +12,8 @@ export function getUserPosts(targetId, userId) {
         WHERE i.user_id = users.id 
             AND i.is_profile = true
     ) AS profile_image,
-    COUNT(f.id) AS followers,
-    COUNT(f2.id) AS following,
+    (SELECT COUNT(*) FROM follows WHERE following_user_id=$1) AS followers,
+    (SELECT COUNT(*) FROM follows WHERE user_id=$1) AS following,
     CASE
       WHEN COUNT( posts.id ) > 0
         THEN JSONB_AGG(JSONB_BUILD_OBJECT(
@@ -32,17 +32,13 @@ export function getUserPosts(targetId, userId) {
           'likes', ( SELECT COUNT(*) FROM likes WHERE post_id = posts.id),
           'user_liked', (
             SELECT EXISTS(
-              SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = $2
+              SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = $1
             )
             )
         ) ORDER BY posts.created_at DESC )
       ELSE '[]'
     END AS posts
     FROM users
-    LEFT JOIN
-        follows f ON users.id = f.following_user_id
-    LEFT JOIN
-        follows f2 ON users.id = f2.user_id
     LEFT JOIN
         posts ON users.id = posts.user_id
     LEFT JOIN
@@ -52,7 +48,7 @@ export function getUserPosts(targetId, userId) {
     GROUP BY
         users.id;
     `,
-    [targetId, userId]
+    [userId]
   );
   return result;
 }

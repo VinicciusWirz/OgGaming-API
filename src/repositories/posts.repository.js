@@ -35,7 +35,7 @@ export function getUserPosts(targetId, userId) {
               SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = $2
             )
             )
-        ))
+        ) ORDER BY posts.created_at DESC )
       ELSE '[]'
     END AS posts
     FROM users
@@ -67,6 +67,55 @@ export function insertNewPostDB(content, image_id, userId) {
         RETURNING id;
     `,
     [userId, image_id, content]
+  );
+  return result;
+}
+
+export function findPostLiked(userId, postId) {
+  const result = db.query(
+    `
+        SELECT EXISTS (
+            SELECT 1 FROM likes 
+            WHERE user_id=$1 AND post_id=$2
+        ) AS like_exists;
+    `,
+    [userId, postId]
+  );
+  return result;
+}
+
+export function removePostLiked(userId, postId) {
+  const result = db.query(
+    `
+        DELETE FROM likes
+        WHERE user_id=$1 AND post_id=$2;
+    `,
+    [userId, postId]
+  );
+  return result;
+}
+
+export function addPostLiked(userId, postId) {
+  const result = db.query(
+    `
+        INSERT INTO likes
+        (user_id, post_id)
+        VALUES
+        ($1, $2);
+    `,
+    [userId, postId]
+  );
+  return result;
+}
+
+export function getLikes(userId, postId) {
+  const result = db.query(
+    `
+        SELECT 
+        (SELECT COUNT(*) FROM likes WHERE post_id=$2) AS like_count,
+        EXISTS (SELECT 1 FROM likes WHERE user_id=$1 AND post_id=$2) AS user_liked;
+    `,
+    [userId, postId]
   );
   return result;
 }

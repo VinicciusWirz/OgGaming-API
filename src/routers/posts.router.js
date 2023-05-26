@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { getUserPost, makeNewPost } from "../controllers/posts.controller.js";
+import {
+  getUserPost,
+  likePost,
+  makeNewPost,
+} from "../controllers/posts.controller.js";
 import authValidation from "../middlewares/authValidation.middleware.js";
 import schemaValidation from "../middlewares/schemaValidation.middleware.js";
 import { postSchema } from "../schemas/post.schema.js";
@@ -13,5 +17,6 @@ postsRouter.post(
   schemaValidation(postSchema),
   makeNewPost
 );
+postsRouter.post("/posts/like/:id", authValidation, likePost);
 
 export default postsRouter;

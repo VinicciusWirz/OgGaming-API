@@ -33,3 +33,15 @@ export async function likePost(req, res) {
     res.status(500).send(error.message);
   }
 }
+
+export async function getPublicUserPost(req, res) {
+  const userId = res.locals.userId;
+
+  const visitorUserId = res.locals.visitorUserId;
+  try {
+    const result = await postService.getUserPostsReqs(visitorUserId, userId);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}

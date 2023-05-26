@@ -19,12 +19,12 @@ export function checkUsernameDB(username) {
     `
         SELECT id FROM users WHERE username=$1;
     `,
-    [username]
+    [username.trim()]
   );
   return result;
 }
 
-export function checkUserIdDB(userId){
+export function checkUserIdDB(userId) {
   const result = db.query(
     `
         SELECT * FROM users WHERE id=$1;

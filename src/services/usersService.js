@@ -1,4 +1,9 @@
-import { followReq, isFollowing, unfollowReq } from "../repositories/users.repository.js";
+import {
+  findFollowers,
+  followReq,
+  isFollowing,
+  unfollowReq,
+} from "../repositories/users.repository.js";
 
 async function followHandle(userId, targetId) {
   try {
@@ -8,11 +13,20 @@ async function followHandle(userId, targetId) {
     } else {
       await followReq(userId, targetId);
     }
-    return {is_following: !rows[0].follows};
+    return { is_following: !rows[0].follows };
   } catch (error) {
     return error.message;
   }
 }
 
-const usersService = { followHandle };
+async function fetchFollowerList(userId) {
+  try {
+    const { rows } = await findFollowers(userId);
+    return rows;
+  } catch (error) {
+    return error.message;
+  }
+}
+
+const usersService = { followHandle, fetchFollowerList };
 export default usersService;

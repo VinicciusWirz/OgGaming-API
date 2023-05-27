@@ -41,13 +41,13 @@ export async function signin(req, res) {
   const { email, password } = req.body;
 
   try {
-    const { id, name, username, image, error } = await authenticateUser(
-      email,
-      password
-    );
+    const { id, name, username, image, bio, birthday, error } =
+      await authenticateUser(email, password);
     if (error) return res.sendStatus(error.status);
     const token = jwt.sign({ id, email }, process.env.SECRET_KEY);
-    res.status(200).send({ name, username, image, token });
+    res
+      .status(200)
+      .send({ name, username, image, bio, email, birthday, token });
   } catch (error) {
     res.status(500).send(error.message);
   }

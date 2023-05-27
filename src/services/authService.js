@@ -41,6 +41,8 @@ export async function authenticateUser(email, password) {
       id: userId,
       name: rows[0].name,
       username: rows[0].username,
+      bio: rows[0].bio,
+      birthday: rows[0].birthday,
       image: pfp,
     };
   } catch (error) {

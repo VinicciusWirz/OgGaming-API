@@ -37,7 +37,8 @@ export function checkUserIdDB(userId) {
 export function checkUserEmailDB(email) {
   const result = db.query(
     `
-        SELECT id, password, username, name FROM users WHERE email=$1;
+        SELECT id, password, username, name, bio, birthday
+         FROM users WHERE email=$1;
     `,
     [email]
   );

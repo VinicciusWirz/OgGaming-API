@@ -5,6 +5,8 @@ import {
   followReq,
   isFollowing,
   unfollowReq,
+  updateUserDB,
+  updateUserPicDB,
 } from "../repositories/users.repository.js";
 
 async function followHandle(userId, targetId) {
@@ -49,10 +51,34 @@ async function fetchUserQuery(userId, name) {
   }
 }
 
+async function editUser(userId, body) {
+  const { image, name, username, bio, birthday, email } = body;
+  const lowerUsername = username?.toLowerCase();
+  try {
+    if (image) {
+      const result = await updateUserPicDB(image, userId);
+      return result;
+    } else {
+      const result = await updateUserDB(
+        name,
+        lowerUsername,
+        bio,
+        birthday,
+        email,
+        userId
+      );
+      return result;
+    }
+  } catch (error) {
+    return error.message;
+  }
+}
+
 const usersService = {
   followHandle,
   fetchFollowerList,
   fetchFollowingList,
   fetchUserQuery,
+  editUser,
 };
 export default usersService;

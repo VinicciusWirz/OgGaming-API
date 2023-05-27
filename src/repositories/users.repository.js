@@ -177,5 +177,35 @@ export function findNameQuery(userId, name) {
     [userId, name]
   );
   return result;
-  
+}
+
+export function updateUserDB(name, username, bio, birthday, email, userId) {
+  const result = db.query(
+    `
+      UPDATE users
+      SET 
+        name= $1, 
+        username= $2, 
+        bio= $3, 
+        birthday= $4, 
+        email= $5
+      WHERE
+        id = $6;
+    `,
+    [name, username, bio, birthday, email, userId]
+  );
+  return result;
+}
+
+export function updateUserPicDB(image, userId) {
+  const result = db.query(
+    `
+      UPDATE images
+      SET image_url=$1
+      WHERE 
+      user_id = $2 AND is_profile = true;
+    `,
+    [image, userId]
+  );
+  return result;
 }

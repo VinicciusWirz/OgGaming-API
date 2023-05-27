@@ -45,3 +45,15 @@ export async function getSearchQuery(req, res) {
     res.status(500).send(error.message);
   }
 }
+
+export async function editUserInfo(req, res) {
+  const userId = res.locals.userId;
+  const body = req.body;
+  try {
+    const result = await usersService.editUser(userId, body);
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}

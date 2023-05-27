@@ -1,14 +1,8 @@
-import { deletePostImg } from "../repositories/images.repository.js";
-import {
-  deletePostDB,
-  deletePostLike,
-  getUserPosts,
-} from "../repositories/posts.repository.js";
+import { getUserPosts } from "../repositories/posts.repository.js";
 import postService from "../services/postService.js";
 
 export async function getUserPost(req, res) {
   const userId = res.locals.userId;
-  const targetId = req.params.id || userId;
   try {
     const { rows } = await getUserPosts(userId);
     res.status(200).send(rows[0]);
@@ -22,7 +16,7 @@ export async function makeNewPost(req, res) {
   const userId = res.locals.userId;
   try {
     const result = await postService.createNewPost(content, image, userId);
-    res.status(201).send({ postId: result.id });
+    res.status(201).send({ ...result, content: content });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -56,9 +50,7 @@ export async function deletePost(req, res) {
   const postId = req.params.id;
   const imageId = res.locals.imageId;
   try {
-    console.log("controller");
     await postService.deleteUserPostReq(postId, userId, imageId);
-    console.log("past service");
     res.sendStatus(200);
   } catch (error) {
     res.status(500).send(error.message);

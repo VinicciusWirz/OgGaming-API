@@ -60,7 +60,7 @@ export function insertNewPostDB(content, image_id, userId) {
         (user_id, image_id, content)
         VALUES
         ($1, $2, $3)
-        RETURNING id;
+        RETURNING id, created_at;
     `,
     [userId, image_id, content]
   );

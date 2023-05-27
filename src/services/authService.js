@@ -16,7 +16,7 @@ export async function createNewUsername() {
       return username;
     }
   } catch (error) {
-    return error.message;
+    return { error: error.message };
   }
 }
 

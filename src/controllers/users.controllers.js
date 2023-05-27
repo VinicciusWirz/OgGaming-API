@@ -5,6 +5,9 @@ export async function followUser(req, res) {
   const targetId = res.locals.visitorUserId;
   try {
     const result = await usersService.followHandle(userId, targetId);
+    if (result.error) {
+      return res.status(result.error.status).send(result.error.message);
+    }
 
     res.status(200).send(result);
   } catch (error) {
@@ -16,6 +19,9 @@ export async function getFollowerList(req, res) {
   const userId = res.locals.userId;
   try {
     const result = await usersService.fetchFollowerList(userId);
+    if (result.error) {
+      return res.status(result.error.status).send(result.error.message);
+    }
 
     res.status(200).send(result);
   } catch (error) {
@@ -27,6 +33,9 @@ export async function getFollowingList(req, res) {
   const userId = res.locals.userId;
   try {
     const result = await usersService.fetchFollowingList(userId);
+    if (result.error) {
+      return res.status(result.error.status).send(result.error.message);
+    }
 
     res.status(200).send(result);
   } catch (error) {
@@ -39,6 +48,9 @@ export async function getSearchQuery(req, res) {
   const name = req.params.name;
   try {
     const result = await usersService.fetchUserQuery(userId, name);
+    if (result.error) {
+      return res.status(result.error.status).send(result.error.message);
+    }
 
     res.status(200).send(result);
   } catch (error) {
@@ -51,6 +63,9 @@ export async function editUserInfo(req, res) {
   const body = req.body;
   try {
     const result = await usersService.editUser(userId, body);
+    if (result.error) {
+      return res.status(result.error.status).send(result.error.message);
+    }
 
     res.status(200).send(result);
   } catch (error) {

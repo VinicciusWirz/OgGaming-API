@@ -2,10 +2,10 @@ import Joi from "joi";
 
 const userInfo = Joi.object({
   name: Joi.string().required(),
-  username: Joi.string().max(11).required(),
+  username: Joi.string().min(6).max(11).required(),
   email: Joi.string().email().required(),
   bio: Joi.string().max(200).required(),
-  birthday: Joi.string().optional(),
+  birthday: Joi.optional(),
 });
 
 const userPfp = Joi.object({

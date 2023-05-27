@@ -19,7 +19,7 @@ async function followHandle(userId, targetId) {
     }
     return { is_following: !rows[0].follows };
   } catch (error) {
-    return error.message;
+    return { error: { status: 500, message: error.message } };
   }
 }
 
@@ -28,7 +28,7 @@ async function fetchFollowerList(userId) {
     const { rows } = await findFollowers(userId);
     return rows;
   } catch (error) {
-    return error.message;
+    return { error: { status: 500, message: error.message } };
   }
 }
 
@@ -37,7 +37,7 @@ async function fetchFollowingList(userId) {
     const { rows } = await findFollowing(userId);
     return rows;
   } catch (error) {
-    return error.message;
+    return { error: { status: 500, message: error.message } };
   }
 }
 
@@ -47,7 +47,7 @@ async function fetchUserQuery(userId, name) {
     const { rows } = await findNameQuery(userId, name);
     return rows;
   } catch (error) {
-    return error.message;
+    return { error: { status: 500, message: error.message } };
   }
 }
 
@@ -70,7 +70,21 @@ async function editUser(userId, body) {
       return result;
     }
   } catch (error) {
-    return error.message;
+    if (error.constraint === "users_username_key") {
+      return { error: { status: 409, message: "username is taken" } };
+    }
+    if (error.constraint === "users_email_key") {
+      return { error: { status: 409, message: "email is in use" } };
+    }
+    if (error.constraint === "images_image_url_key") {
+      return { error: { status: 400, message: "image need to be valid url" } };
+    }
+    if (error.constraint === "images_user_id_key") {
+      return {
+        error: { status: 401, message: "image needs to pair with valid user" },
+      };
+    }
+    return { error: { status: 500, message: error.message } };
   }
 }
 

@@ -174,3 +174,35 @@ export function getPublicUserPosts(visitorUserId, userId) {
   );
   return result;
 }
+
+export function checkPostOwnership(postId, userId) {
+  const result = db.query(
+    `
+      SELECT image_id FROM posts WHERE id=$1 AND user_id=$2;
+    `,
+    [postId, userId]
+  );
+  return result;
+}
+
+export function deletePostDB(postId, userId) {
+  const result = db.query(
+    `
+      DELETE FROM posts
+      WHERE id = $1 AND user_id=$2;
+    `,
+    [postId, userId]
+  );
+  return result;
+}
+
+export function deletePostLike(postId) {
+  const result = db.query(
+    `
+      DELETE FROM likes
+      WHERE post_id = $1;
+    `,
+    [postId]
+  );
+  return result;
+}

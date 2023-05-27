@@ -1,6 +1,11 @@
-import { insertNewPostImage } from "../repositories/images.repository.js";
+import {
+  deletePostImg,
+  insertNewPostImage,
+} from "../repositories/images.repository.js";
 import {
   addPostLiked,
+  deletePostDB,
+  deletePostLike,
   findPostLiked,
   getLikes,
   getPublicUserPosts,
@@ -43,5 +48,21 @@ async function getUserPostsReqs(visitorUserId, userId) {
   }
 }
 
-const postService = { createNewPost, likePostReqs, getUserPostsReqs };
+async function deleteUserPostReq(postId, userId, imageId) {
+  try {
+    await deletePostLike(postId);
+    await deletePostDB(postId, userId);
+    const result = await deletePostImg(imageId, userId);
+    return result;
+  } catch (error) {
+    return error.message;
+  }
+}
+
+const postService = {
+  createNewPost,
+  likePostReqs,
+  getUserPostsReqs,
+  deleteUserPostReq,
+};
 export default postService;

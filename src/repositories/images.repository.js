@@ -49,3 +49,14 @@ export function insertNewPostImage(image, userId) {
   );
   return result;
 }
+
+export function deletePostImg(imageId, userId) {
+  const result = db.query(
+    `
+      DELETE FROM images
+      WHERE id=$1 AND user_id=$2;
+    `,
+    [imageId, userId]
+  );
+  return result;
+}

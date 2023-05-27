@@ -5,7 +5,6 @@ import {
   likePost,
   makeNewPost,
 } from "../controllers/posts.controller.js";
-import authOptionalValidation from "../middlewares/authOptionalValidation.middleware.js";
 import authValidation from "../middlewares/authValidation.middleware.js";
 import schemaValidation from "../middlewares/schemaValidation.middleware.js";
 import usernameValidation from "../middlewares/usernameValidation.middleware.js";
@@ -23,7 +22,7 @@ postsRouter.post(
 postsRouter.post("/posts/like/:id", authValidation, likePost);
 postsRouter.get(
   "/posts/user/:username",
-  authOptionalValidation,
+  authValidation,
   usernameValidation,
   getPublicUserPost
 );

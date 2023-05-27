@@ -4,7 +4,6 @@ import {
   findPostLiked,
   getLikes,
   getPublicUserPosts,
-  getPublicUserPostsNoLogin,
   insertNewPostDB,
   removePostLiked,
 } from "../repositories/posts.repository.js";
@@ -37,13 +36,8 @@ async function likePostReqs(userId, postId) {
 
 async function getUserPostsReqs(visitorUserId, userId) {
   try {
-    if (userId) {
-      const result = await getPublicUserPosts(visitorUserId, userId);
-      return result.rows[0];
-    } else {
-      const result = await getPublicUserPostsNoLogin(visitorUserId);
-      return result.rows[0];
-    }
+    const result = await getPublicUserPosts(visitorUserId, userId);
+    return result.rows[0];
   } catch (error) {
     return error.message;
   }

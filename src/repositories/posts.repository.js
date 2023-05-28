@@ -162,8 +162,8 @@ export function getPublicUserPosts(visitorUserId, userId) {
                 AND user_id = $2
               )
             )
-          ))
-        ELSE '[]'
+          ) ORDER BY posts.created_at DESC
+          ) ELSE '[]'
       END AS posts
     FROM users
     LEFT JOIN (

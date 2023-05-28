@@ -12,12 +12,15 @@ import {
   insertNewPostDB,
   removePostLiked,
 } from "../repositories/posts.repository.js";
+import genCleanText from "../utils/genCleanText.js";
 
 async function createNewPost(content, image, userId) {
+  const cleanContent = genCleanText(content);
+  const cleanImage = genCleanText(image);
   try {
-    const { rows } = await insertNewPostImage(image, userId);
+    const { rows } = await insertNewPostImage(cleanImage, userId);
     const image_id = rows[0].id;
-    const newPost = await insertNewPostDB(content, image_id, userId);
+    const newPost = await insertNewPostDB(cleanContent, image_id, userId);
     return newPost.rows[0];
   } catch (error) {
     return error.message;

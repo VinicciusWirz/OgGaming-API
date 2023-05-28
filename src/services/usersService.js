@@ -8,6 +8,7 @@ import {
   updateUserDB,
   updateUserPicDB,
 } from "../repositories/users.repository.js";
+import genCleanText from "../utils/genCleanText.js";
 
 async function followHandle(userId, targetId) {
   try {
@@ -53,16 +54,20 @@ async function fetchUserQuery(userId, name) {
 
 async function editUser(userId, body) {
   const { image, name, username, bio, birthday, email } = body;
-  const lowerUsername = username?.toLowerCase();
+  const cleanImage = genCleanText(image);
+  const cleanName = genCleanText(name);
+  const cleanBio = genCleanText(bio);
+  const cleanUsername = genCleanText(username).toLowerCase();
+
   try {
     if (image) {
-      const result = await updateUserPicDB(image, userId);
+      const result = await updateUserPicDB(cleanImage, userId);
       return result;
     } else {
       const result = await updateUserDB(
-        name,
-        lowerUsername,
-        bio,
+        cleanName,
+        cleanUsername,
+        cleanBio,
         birthday,
         email,
         userId

@@ -9,24 +9,28 @@ import {
   authenticateUser,
   createNewUsername,
 } from "../services/authService.js";
+import genCleanText from "../utils/genCleanText.js";
 
 export async function signup(req, res) {
   const { name, email, bio, password, picture } = req.body;
+  const cleanName = genCleanText(name);
+  const cleanBio = genCleanText(bio);
+  const cleanPicture = genCleanText(picture);
 
   try {
     const hashPassword = bcrypt.hashSync(password, 10);
     const username = await createNewUsername();
 
     const { rows } = await createUserDB(
-      name,
+      cleanName,
       email,
-      bio,
+      cleanBio,
       hashPassword,
       username
     );
     const userId = rows[0].id;
     if (picture) {
-      await createUserPicDB(picture, userId);
+      await createUserPicDB(cleanPicture, userId);
     } else {
       await createUserDefPicDB(userId);
     }

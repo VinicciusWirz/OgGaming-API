@@ -119,57 +119,86 @@ export function getLikes(userId, postId) {
 export function getPublicUserPosts(visitorUserId, userId) {
   const result = db.query(
     `
-          SELECT 
-          users.bio,
-          users.name,
-          users.username,
-          (
-              SELECT i.image_url FROM images i
-              WHERE i.user_id = users.id 
-                  AND i.is_profile = true
-          ) AS profile_image,
-          COUNT(f.id) AS followers,
-          COUNT(f2.id) AS following,
-          (SELECT EXISTS (SELECT 1 FROM follows WHERE user_id = $2 AND following_user_id = $1)) AS is_following,
-          (SELECT EXISTS (SELECT 1 FROM follows WHERE user_id = $1 AND following_user_id = $2)) AS is_follower,
-          CASE
-            WHEN COUNT( posts.id ) > 0
-              THEN JSONB_AGG(JSONB_BUILD_OBJECT(
-                'id', posts.id,
-                'name', users.name,
-                'username', users.username,
-                'poster_profile_pic', (
-                  SELECT i2.image_url
-                  FROM images i2
-                  WHERE i2.user_id = $1 AND i2.is_profile = true
-                  LIMIT 1
-                ),
-                'image', images.image_url,
-                'content', posts.content,
-                'created_at', posts.created_at,
-                'likes', ( SELECT COUNT(*) FROM likes WHERE post_id = posts.id),
-                'user_liked', (
-                  SELECT EXISTS(
-                    SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = $2
-                  )
-                  )
-              ) ORDER BY posts.created_at DESC )
-            ELSE '[]'
-          END AS posts
-          FROM users
-          LEFT JOIN
-              follows f ON users.id = f.following_user_id
-          LEFT JOIN
-              follows f2 ON users.id = f2.user_id
-          LEFT JOIN
-              posts ON users.id = posts.user_id
-          LEFT JOIN
-              images ON images.id = posts.image_id
-          WHERE
-              users.id = $1
-          GROUP BY
-              users.id;
-          `,
+    SELECT 
+      users.bio,
+      users.name,
+      users.username,
+      (
+        SELECT i.image_url
+        FROM images i
+        WHERE i.user_id = users.id 
+        AND i.is_profile = true
+      ) AS profile_image,
+      followers_count.count AS followers,
+      following_count.count AS following,
+      is_following.exists AS is_following,
+      is_follower.exists AS is_follower,
+      CASE
+        WHEN COUNT(posts.id) > 0
+          THEN JSONB_AGG(JSONB_BUILD_OBJECT(
+            'id', posts.id,
+            'name', users.name,
+            'username', users.username,
+            'poster_profile_pic', (
+              SELECT i2.image_url
+              FROM images i2
+              WHERE i2.user_id = $1
+              AND i2.is_profile = true
+              LIMIT 1
+            ),
+            'image', images.image_url,
+            'content', posts.content,
+            'created_at', posts.created_at,
+            'likes', (
+              SELECT COUNT(*)
+              FROM likes
+              WHERE post_id = posts.id
+            ),
+            'user_liked', (
+              SELECT EXISTS(
+                SELECT 1
+                FROM likes
+                WHERE post_id = posts.id
+                AND user_id = $2
+              )
+            )
+          ))
+        ELSE '[]'
+      END AS posts
+    FROM users
+    LEFT JOIN (
+      SELECT following_user_id, COUNT(*) AS count
+      FROM follows
+      WHERE user_id = $1
+      GROUP BY following_user_id
+    ) AS followers_count ON users.id = followers_count.following_user_id
+    LEFT JOIN (
+      SELECT user_id, COUNT(*) AS count
+      FROM follows
+      WHERE following_user_id = $1
+      GROUP BY user_id
+    ) AS following_count ON users.id = following_count.user_id
+    LEFT JOIN (
+      SELECT EXISTS(
+        SELECT 1
+        FROM follows
+        WHERE user_id = $2
+        AND following_user_id = $1
+      ) AS exists
+    ) AS is_following ON true
+    LEFT JOIN (
+      SELECT EXISTS(
+        SELECT 1
+        FROM follows
+        WHERE user_id = $1
+        AND following_user_id = $2
+      ) AS exists
+    ) AS is_follower ON true
+    LEFT JOIN posts ON users.id = posts.user_id
+    LEFT JOIN images ON images.id = posts.image_id
+    WHERE users.id = $1
+    GROUP BY users.id, followers_count.count, following_count.count, is_following.exists, is_follower.exists;
+    `,
     [visitorUserId, userId]
   );
   return result;

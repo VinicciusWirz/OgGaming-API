@@ -72,7 +72,13 @@ async function editUser(userId, body) {
         email,
         userId
       );
-      return result;
+      return {
+        name: cleanName,
+        bio: cleanBio,
+        username: cleanUsername,
+        email,
+        birthday: birthday ? birthday : null,
+      };
     }
   } catch (error) {
     if (error.constraint === "users_username_key") {
